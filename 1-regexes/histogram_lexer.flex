@@ -8,6 +8,10 @@
 /* Bring in our declarations for token types and
    the yylval variable. */
 #include "histogram.hpp"
+#include <string.h>
+#include <stdlib.h>
+#include <string.h> 
+
 
 
 // This is to work around an irritating bug in Flex
@@ -20,12 +24,41 @@ extern "C" int fileno(FILE *stream);
 
 %%
 
-[0-9]+          { fprintf(stderr, "Number : %s\n", yytext); /* TODO: get value out of yytext and into yylval.numberValue */;  return Number; }
+[-]?[0-9]+([.][0-9]+)?  { fprintf(stderr, "Number : %s\n", yytext);
+                          /*Decimal and Integer */
+                          yylval.numberValue = std::stod(yytext);
+                          return Number; }
+  
 
-[a-z]+          { fprintf(stderr, "Word : %s\n", yytext); /* TODO: get value out of yytext and into yylval.wordValue */;  return Word; }
+[-]?[0-9]+[\/][0-9]+ { fprintf(stderr, "Number : %s\n", yytext);
+                      /*Fraction */
+                      std::string s(yytext);
+                      int i = s.find_first_of("/");
+                      std::string s1 = s.substr(0, i);
+                      std::string s2 = s.substr(i+1, s.length()-i);
+                      double num = std::stod(s1);
+                      double den = std::stod(s2);
+                      yylval.numberValue=num/den;
+                      return Number;}
 
-\n              { fprintf(stderr, "Newline\n"); }
+[a-zA-Z]+|\[([^\]]*)\]  { fprintf(stderr, "Word : %s\n", yytext);
+                        if(yytext[0] == '['){
+                           yytext++;
+                           yytext[strlen(yytext)-1]='\0';
+                           yylval.wordValue = new std::string(yytext);
+                        }
+                        else{
+                           yylval.wordValue = new std::string;
+                           *yylval.wordValue = yytext;
+                        }
+                        return Word; }
 
+
+[\n]             { fprintf(stderr, "Newline\n"); }
+
+.
+
+[ ]
 
 %%
 

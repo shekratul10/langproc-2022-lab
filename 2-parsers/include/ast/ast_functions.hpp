@@ -38,6 +38,7 @@ public:
     {
         // NOTE : This should be implemented by the inheriting function nodes, e.g. LogFunction
         throw std::runtime_error("FunctionOperator::evaluate is not implemented.");
+
     }
 };
 
@@ -53,6 +54,13 @@ public:
     { return "log"; }
     
     // TODO-E : Override evaluate, and implement it
+    virtual double evaluate(
+        const std::map<std::string, double> &bindings
+    ) const override
+    {
+        double v = getArg()->evaluate(bindings);
+        return std::log(v);
+    }
 };
 
 class ExpFunction
@@ -65,6 +73,14 @@ public:
 
     virtual const char *getFunction() const
     { return "exp"; }
+
+    virtual double evaluate(
+        const std::map<std::string, double> &bindings
+    ) const override
+    {
+        double v = getArg()->evaluate(bindings);
+        return std::exp(v);
+    }
 };
 
 class SqrtFunction
@@ -77,6 +93,14 @@ public:
 
     virtual const char *getFunction() const
     { return "sqrt"; }
+
+    virtual double evaluate(
+        const std::map<std::string, double> &bindings
+    ) const override
+    {
+        double v = getArg()->evaluate(bindings);
+        return std::sqrt(v);
+    }
 };
 
 
